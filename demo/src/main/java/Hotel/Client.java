@@ -1,24 +1,17 @@
-package Hotel_POO_java.demo.src.main.java.Hotel;
+package Hotel;
 
-import java.util.Scanner;
 import java.util.HashMap;
 import java.util.Map;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Scanner;
 public class Client extends User {
-    
-    private Database database;
     private UsersManagement usersManagement;
     private User currentUser;
+    private Map<Integer, Reservation> reservations = new HashMap<>();
 
-    public Client(String username, String password, boolean isAdmin, Database database, UsersManagement usersManagement, User currentUser) {
-        super(username, password, isAdmin);
-        this.database = database;
-        this.usersManagement = usersManagement;
-        this.currentUser = currentUser;
-        System.out.println("Current user: " + currentUser.getUsername());
+    public Client(String username, String password) {
+        super(username, password, false);
+        this.usersManagement = new UsersManagement();
+        this.currentUser = null;
     }
 
     void authenticate(String username, String password) {
@@ -26,72 +19,67 @@ public class Client extends User {
     }
 
     public void checkReservation(String username) {
-        String sql = "SELECT * FROM reservations WHERE client_username = ?";
-    
-        try (Connection conn = database.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    
-            pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-    
-            if (rs.next()) {
+        for (Reservation reservation : reservations.values()) {
+            if (reservation.getUsername().equals(username)) {
                 System.out.println("Reservation details:");
-                System.out.println("ID: " + rs.getInt("id"));
-                System.out.println("Room: " + rs.getInt("room_id"));
-                System.out.println("Start date: " + rs.getString("start_date"));
-                System.out.println("End date: " + rs.getString("end_date"));
-                System.out.println("Status: " + rs.getString("status"));
-            } else {
-                System.out.println("No reservation found.");
+                System.out.println("ID: " + reservation.getId());
+                System.out.println("Room: " + reservation.getRoomId());
+                System.out.println("Start date: " + reservation.getStartDate());
+                System.out.println("End date: " + reservation.getEndDate());
+                System.out.println("Status: " + reservation.getStatus());
+                return;
             }
-    
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
+        System.out.println("No reservation found.");
     }
+
     public void reserveRoom(String username) {
-        String sql = "SELECT * FROM rooms WHERE is_reserved = false";
-        String sql2 = "SELECT idusers FROM users WHERE username = ?";
-    
-       
-    
-        try (Connection conn = database.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             PreparedStatement pstmt2 = conn.prepareStatement(sql2)) {
-    
-            // Execute the first query
-            ResultSet rs = pstmt.executeQuery();
-    
-            if (rs.next()) {
-                System.out.println("Available rooms:");
-                do {
-                    System.out.println("ID: " + rs.getInt("id") + ", Number: " + rs.getInt("number") + ", Type: " + rs.getString("type") + ", Price: " + rs.getDouble("price"));
-                } while (rs.next());
-    
-                System.out.println("Enter the ID of the room you want to reserve:");
-                Scanner scanner = new Scanner(System.in);
-                int roomId = scanner.nextInt();
-                scanner.nextLine();
-                
-                // Execute the second query to get the user's idusers
-                pstmt2.setString(1, username);
-                ResultSet rs2 = pstmt2.executeQuery();
-                rs2.next();
-                int userId = rs2.getInt("idusers");
-                
-                // Create a new Reservation object
-                Reservation reservation = new Reservation(userId, username, roomId, "2021-04-21", "2021-05-21", "Pending", database);
-                
-                // Save the reservation to the database
-                reservation.save();
-                
-                System.out.println("Reservation created.");
-            } else {
-                System.out.println("No available rooms.");
-            }
-    
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        // Check if the user exists
+        User user = User.getUsers().get(username);
+        if (user == null) {
+            System.out.println("User not found.");
+            return;
         }
+    
+        // Check if there are available rooms
+        if (Room.getRooms().isEmpty()) {
+            System.out.println("No available rooms.");
+            return;
+        }
+    
+        // Print available rooms
+        System.out.println("Available rooms:");
+        for (Room room : Room.getRooms().values()) {
+            System.out.println("ID: " + room.getId() + ", Number: " + room.getNumber() + ", Type: " + room.getType() + ", Price: " + room.getPrice());
+        }
+    
+        // Ask the user to enter the ID of the room they want to reserve
+        System.out.println("Enter the Number of the room you want to reserve:");
+        Scanner scanner = new Scanner(System.in);
+        int roomId = scanner.nextInt();
+        scanner.nextLine();
+    
+        // Check if the room exists
+        Room room = Room.getRooms().get(roomId);
+        if (room == null) {
+            System.out.println("Room not found.");
+            return;
+        }
+    
+        // Create a new Reservation object
+        Reservation reservation = new Reservation(user.getId(), username, roomId, "2021-04-21", "2021-05-21", "Pending");
+    
+        // Add the reservation to the reservations HashMap
+        reservations.put(reservation.getId(), reservation);
+    
+        System.out.println("Reservation created.");
     }
+    @Override
+public String toString() {
+    return "Client{" +
+        "username='" + getUsername() + '\'' +
+        ", password='" + getPassword() + '\'' +
+        ", isAdmin=" + isAdmin() +
+    '}';
+}
 }

@@ -1,4 +1,4 @@
-package Hotel_POO_java.demo.src.main.java.Hotel;
+package Hotel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,11 +8,13 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         UsersManagement userManager = new UsersManagement();
-
+        Application app = new Application();
+        
         int choice = 0;
-        while (choice != 3) {
+        while (choice != 6) {
 
-            System.out.println("1. Register\n2. Login\n3. Quit");
+            System.out.println("1. Register\n2. Login\n3. Check Users Hashmap\n4. Check Rooms Hashmap\n" + //
+                                "5. Check Reservations Hashmap\n6. Quit");
 
             while (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Please enter a number.");
@@ -33,7 +35,7 @@ public class Main {
                     int roleChoice = scanner.nextInt();
                     scanner.nextLine();
                     boolean isAdmin = (roleChoice == 2);
-                    isRegistered = userManager.register(username, password, isAdmin);
+                    isRegistered =  app.register(username, password, isAdmin);
                     if (!isRegistered) {
                         System.out.println("Username already exists. Please enter another username.");
                     }
@@ -43,7 +45,7 @@ public class Main {
                 String username = scanner.next();
                 System.out.println("Enter password:");
                 String password = scanner.next();
-                User user = userManager.login(username, password);
+                User user = app.login(username, password);
                 if (user != null) {
                     int userChoice = 0;
                     if (user instanceof Client) {
@@ -139,8 +141,18 @@ public class Main {
                 } else {
                     System.out.println("Invalid username or password.");
                 }
-            } else if (choice != 3) {
-                System.out.println("Invalid choice.");
+            } else if(choice == 3) {
+                // Print users
+                User.printUsers();
+            } else if(choice == 4) {
+                // Print rooms
+                app.getRoomsManagement().printRooms();
+            } else if(choice == 5) {
+                // Print reservations
+                app.getReservationManagement().printReservations();
+            } else if (choice != 6) {
+                // Invalid choice
+                System.out.println("Invalid choice. Please enter a number between 1 and 6.");
             }
         }
 

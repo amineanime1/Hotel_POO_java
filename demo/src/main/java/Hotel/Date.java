@@ -1,4 +1,4 @@
-package Hotel_POO_java.demo.src.main.java.Hotel;
+package Hotel;
 
 public class Date {
     private int year;

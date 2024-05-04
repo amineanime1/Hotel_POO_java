@@ -1,101 +1,124 @@
-package Hotel_POO_java.demo.src.main.java.Hotel;
+package Hotel;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Reservation {
-    int id;
-    Room room;
-    User client;
-    String username;
-    int roomId;
-    int userId;
-    String startDate;
-    String endDate;
-    String status;
-    private static Database database = new Database();
+    private static HashMap<Integer, Reservation> reservations = new HashMap<>();
+    private static int idCounter = 0;
+    private int id;
+    private Room room;
+    private User client;
+    private String username;
+    private int roomId;
+    private int userId;
+    private String startDate;
+    private String endDate;
+    private String status;
 
-    public Reservation(int userId, String username, int roomId, String startDate, String endDate, String status, Database database) {
+    public Reservation(int userId, String username, int roomId, String startDate, String endDate, String status) {
+        this.id = idCounter++;
         this.userId = userId;
         this.username = username;
         this.roomId = roomId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
-        this.database = database;
+        reservations.put(id, this);
     }
 
-    void accept() {
+    public static Reservation getReservationById(int id) {
+        return reservations.get(id);
+    }
+
+    public void accept() {
         this.status = "Accepted";
-    
-        String sql = "UPDATE reservations SET status = 'Accepted' WHERE id = ?";
-    
-        try (Connection conn = database.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    
-            pstmt.setInt(1, this.id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
     }
-    
-    void decline() {
+
+    public void decline() {
         this.status = "Declined";
-    
-        String sql = "UPDATE reservations SET status = 'Declined' WHERE id = ?";
-    
-        try (Connection conn = database.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    
-            pstmt.setInt(1, this.id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
     }
-    static Reservation getReservationByUsername(String username) {
-        String sql = "SELECT * FROM reservations WHERE client_username = ?";
-    
-        try (Connection conn = database.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    
-            pstmt.setString(1, username);
-    
-            ResultSet rs = pstmt.executeQuery();
-    
-            if (rs.next()) {
-                int userId = rs.getInt("user_id");
-                int roomId = rs.getInt("room_id");
-                String startDate = rs.getString("start_date");
-                String endDate = rs.getString("end_date");
-                String status = rs.getString("status");
-    
-                return new Reservation(userId, username, roomId, startDate, endDate, status, database);
+
+    public static Reservation getReservationByUsername(String username) {
+        for (Reservation reservation : reservations.values()) {
+            if (reservation.getUsername().equals(username)) {
+                return reservation;
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
-    
         return null;
     }
-    
-    void save() {
-        String sql = "INSERT INTO reservations (client_username, room_id, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)";
-    
-        try (Connection conn = database.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    
-            pstmt.setString(1, this.username);
-            pstmt.setInt(2, this.roomId);
-            pstmt.setString(3, this.startDate);
-            pstmt.setString(4, this.endDate);
-            pstmt.setString(5, this.status);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+
+    // Getters and setters
+    public int getId() {
+        return id;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public User getClient() {
+        return client;
+    }
+
+    public void setClient(User client) {
+        this.client = client;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public int getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+  
 }

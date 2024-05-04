@@ -1,48 +1,53 @@
-package Hotel_POO_java.demo.src.main.java.Hotel;
+package Hotel;
 
-import java.util.Scanner;
 import java.util.HashMap;
 import java.util.Map;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Administrator extends User {
-
-    private Database database;
     private UsersManagement usersManagement;
     private User currentUser;
+    private Map<Integer, Room> rooms = new HashMap<>();
+    private Map<Integer, Reservation> reservations = new HashMap<>();
+    private RoomManagement roomManagement;
 
-    public Administrator(String username, String password, boolean isAdmin, Database database, UsersManagement usersManagement, User currentUser) {
-        super(username, password, isAdmin);
-        this.database = database;
-        this.usersManagement = usersManagement;
-        this.currentUser = currentUser;
+
+    public Administrator(String username, String password) {
+        super(username, password, true);
+        this.usersManagement = new UsersManagement();
+        this.roomManagement = new RoomManagement();
+        this.currentUser = null;
     }
 
+    public Administrator(String username, String password, RoomManagement roomManagement) {
+        super(username, password, true);
+        this.usersManagement = new UsersManagement();
+        this.roomManagement = roomManagement;
+        this.currentUser = null;
+    }
 
+    void authenticate(String username, String password) {
+        // Implement authentication logic
+    }
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
+    public void createRoom(int number, String type, double price) {
+        if (currentUser != null) {
+            System.out.println("Current user: " + currentUser.getUsername());
+        } else {
+            System.out.println("No user is currently logged in.");
+            return;
+        }
 
-        void authenticate(String username, String password) {
-            // Implement authentication logic
-        }
-    
-        public void createRoom(int number, String type, double price) {
-            if (currentUser != null) {
-                System.out.println("Current user: " + currentUser.getUsername());
-            } else {
-                System.out.println("No user is currently logged in.");
-                return;
-            }
-        
-            // Create a new Room object
-            Room room = new Room(number, type, price,false, database);
-        
-            // Save the room to the database
-            room.save();
-        
-            System.out.println("Room created.");
-        }
+        // Create a new Room object
+        Room room = new Room(number, type, price, false);
+
+        // Add the room to the rooms HashMap
+        roomManagement.addRoom(room);
+
+        System.out.println("Room created.");
+    }
 
     public void modifyRoom(int number, String newType, double newPrice) {
         if (currentUser != null) {
@@ -51,23 +56,20 @@ public class Administrator extends User {
             System.out.println("No user is currently logged in.");
             return;
         }
-    
+
         // Get the room with the entered number
-        Room room = Room.getRoomByNumber(number);
-    if (room != null) {
-        // Modify the room
-        room.setType(newType);
-        room.setPrice(newPrice);
+        Room room = rooms.get(number);
+        if (room != null) {
+            // Modify the room
+            room.setType(newType);
+            room.setPrice(newPrice);
 
-        // Save the changes to the database
-        room.update();
+            System.out.println("Room modified.");
+        } else {
+            System.out.println("No room found with the entered number.");
+        }
+    }
 
-        System.out.println("Room modified.");
-    } else {
-        System.out.println("No room found with the entered number.");
-    }
-    }
-    
     public void deleteRoom(int number) {
         if (currentUser != null) {
             System.out.println("Current user: " + currentUser.getUsername());
@@ -75,71 +77,40 @@ public class Administrator extends User {
             System.out.println("No user is currently logged in.");
             return;
         }
-    
-        // Get the room with the entered number
-        Room room = Room.getRoomByNumber(number);
-        if (room != null) {
-            // Delete the room
-            room.delete();
-    
+
+        // Remove the room from the rooms HashMap
+        if (rooms.remove(number) != null) {
             System.out.println("Room deleted.");
         } else {
             System.out.println("No room found with the entered number.");
         }
     }
     void manageReservations() {
-        String sql = "SELECT * FROM reservations WHERE status = 'Pending'";
-    
-        try (Connection conn = database.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    
-            ResultSet rs = pstmt.executeQuery();
-    
-            while (rs.next()) {
-                int reservationId = rs.getInt("id");
-                String username = rs.getString("client_username");
-                int roomId = rs.getInt("room_id");
-                String status = rs.getString("status");
-                int userId = rs.getInt("user_id");
-    
-                System.out.println("Reservation ID: " + reservationId);
-                System.out.println("Username: " + username);
-                System.out.println("Username ID: " + userId);
-                System.out.println("Room ID: " + roomId);
-                System.out.println("Status: " + status);
+        // Iterate over the reservations HashMap
+        for (Reservation reservation : reservations.values()) {
+            if (reservation.getStatus().equals("Pending")) {
+                System.out.println("Reservation ID: " + reservation.getId());
+                System.out.println("Username: " + reservation.getUsername());
+                System.out.println("Room ID: " + reservation.getRoomId());
+                System.out.println("Status: " + reservation.getStatus());
     
                 System.out.println("Enter 1 to accept, 2 to decline:");
                 Scanner scanner = new Scanner(System.in);
                 int choice = scanner.nextInt();
                 scanner.nextLine();
-
+    
                 if (choice == 1) {
                     // Accept the reservation
-                    String updateSql = "UPDATE reservations SET status = 'Accepted' WHERE id = ?";
-                    try (PreparedStatement updatePstmt = conn.prepareStatement(updateSql)) {
-                        updatePstmt.setInt(1, reservationId);
-                        updatePstmt.executeUpdate();
-                        System.out.println("Reservation accepted.");
-                    }
+                    reservation.setStatus("Accepted");
+                    System.out.println("Reservation accepted.");
                 } else if (choice == 2) {
                     // Decline the reservation
-                    String updateSql = "UPDATE reservations SET status = 'Declined' WHERE id = ?";
-                    try (PreparedStatement updatePstmt = conn.prepareStatement(updateSql)) {
-                        updatePstmt.setInt(1, reservationId);
-                        updatePstmt.executeUpdate();
-                        System.out.println("Reservation declined.");
-                    }
+                    reservation.setStatus("Declined");
+                    System.out.println("Reservation declined.");
                 } else {
                     System.out.println("Invalid choice. Please enter 1 or 2.");
                 }
- 
-                
-
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
-
-
     }
 }

@@ -1,49 +1,46 @@
-package Hotel_POO_java.demo.src.main.java.Hotel;
+package Hotel;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class User {
+    private static HashMap<String, User> users = new HashMap<>();
+    private static int idCounter = 0;
+    private int id;
     private String username;
     private String password;
     private boolean isAdmin;
-    private Database database;
 
-    public User(String username, String password, boolean isAdmin, Database database) {
-        this.username = username;
-        this.password = password;
-        this.isAdmin = isAdmin;
-        this.database = database;
-    }
+
     public User(String username, String password, boolean isAdmin) {
+        this.id = idCounter++;
         this.username = username;
         this.password = password;
         this.isAdmin = isAdmin;
+        users.put(username, this);
     }
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
+    public String getUsername() {
+        return username;
     }
 
     public String getPassword() {
-        return this.password;
+        return password;
     }
-    public String getUsername() {
-        return this.username;
+    public int getId() {
+        return id;
     }
     public boolean isAdmin() {
-        return this.isAdmin;
+        return isAdmin;
     }
-    
-    void authenticate(String username, String password)
-    {
-        if (this.username.equals(username) && this.password.equals(password)) {
-            System.out.println("Authentication successful");
-        } else {
-            System.out.println("Authentication failed");
+
+    public static HashMap<String, User> getUsers() {
+        return users;
+    }
+    public static void printUsers() {
+        for (Map.Entry<String, User> entry : users.entrySet()) {
+            User user = entry.getValue();
+            System.out.println("Username: " + user.getUsername() + ", Password: " + user.getPassword() + ", Is Admin: " + user.isAdmin());
         }
-    };
+    }
 }
