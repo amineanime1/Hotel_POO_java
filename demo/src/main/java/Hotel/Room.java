@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Room {
     private static HashMap<Integer, Room> rooms = new HashMap<>();
+    private static int nextId = 0;
     private int id;
     private int number;
     private String type;
@@ -12,6 +13,7 @@ public class Room {
     private boolean isReserved;
 
     public Room(int number, String type, double price, boolean isReserved) {
+        this.id = nextId++;
         this.number = number;
         this.type = type;
         this.price = price;

@@ -10,9 +10,9 @@ public class Application {
 
    
     public Application() {
-        this.usersManagement = new UsersManagement();
-        this.roomManagement = new RoomManagement();
+               this.roomManagement = new RoomManagement();
         this.reservationManagement = new ReservationManagement();
+        this.usersManagement = new UsersManagement(roomManagement, reservationManagement);
     }
 
     public boolean register(String username, String password, boolean isAdmin) {
@@ -46,7 +46,9 @@ public class Application {
         }
     }
 
-
+    public UsersManagement getUsersManagement() {
+        return usersManagement;
+    }
     public ReservationManagement getReservationManagement() {
         return reservationManagement;
     }
@@ -54,6 +56,7 @@ public class Application {
     public RoomManagement getRoomsManagement() {
         return roomManagement;
     }
+
 
 //     public void printRooms() {
 //     Map<Integer, Room> rooms = roomManagement.getRooms();

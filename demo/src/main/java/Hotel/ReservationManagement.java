@@ -2,7 +2,12 @@ package Hotel;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class ReservationManagement {
     private Map<Integer, Reservation> reservations;
@@ -14,20 +19,85 @@ public class ReservationManagement {
     public Map<Integer, Reservation> getReservations() {
         return reservations;
     }
+
     public void printReservations() {
         for (Map.Entry<Integer, Reservation> entry : reservations.entrySet()) {
             Reservation reservation = entry.getValue();
-            System.out.println("Reservation ID: " + reservation.getId() + ", Room Number: " + reservation.getRoomId() + ", User: " + reservation.getClient());
+            System.out.println("Reservation ID: " + reservation.getId() + ", Room Number: " + reservation.getRoomId() + ", User: " + reservation.getUsername() + ", Status: " + reservation.getStatus());
         }
     }
-        public void addReservation(Reservation reservation) {
-            reservations.put(reservation.getId(), reservation);
-        }
+
+    public void addReservation(Reservation reservation) {
+        reservations.put(reservation.getId(), reservation);
+    }
+
+    public Reservation getReservationById(int id) {
+        return reservations.get(id);
+    }
+
+    public void removeReservation(int id) {
+        reservations.remove(id);
+    }
+
+    public void updateReservation(int id, Reservation newReservation) {
+        reservations.put(id, newReservation);
+    }
+
+    public void loadReservationsFromDatabase() {
+        Database db = new Database();
+        try {
+            // Connect to the database
+            Connection connection = db.connect();
     
-        public Reservation getReservationById(int id) {
-            return reservations.get(id);
+            // Execute a SQL query to get all reservations
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM reservations");
+    
+            // Iterate over the result set and add each reservation to the reservations hashmap
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String username = resultSet.getString("username");
+                int roomId = resultSet.getInt("roomId");
+                String startDate = resultSet.getString("startDate");
+                String endDate = resultSet.getString("endDate");
+                String status = resultSet.getString("status");
+    
+                Reservation reservation = new Reservation(id, username, roomId, startDate, endDate, status);
+                reservations.put(reservation.getId(), reservation);
+            }
+    
+            // Close the connection
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void saveReservationsToDatabase() {
+    Database db = new Database();
+    try {
+        // Connect to the database
+        Connection connection = db.connect();
+
+        // Delete all reservations from the reservations table
+        Statement statement = connection.createStatement();
+        statement.executeUpdate("DELETE FROM reservations");
+
+        // Insert each reservation from the reservations hashmap into the reservations table
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO reservations (id, username, roomId, startDate, endDate, status) VALUES (?, ?, ?, ?, ?, ?)");
+        for (Reservation reservation : reservations.values()) {
+            preparedStatement.setInt(1, reservation.getId());
+            preparedStatement.setString(2, reservation.getUsername());
+            preparedStatement.setInt(3, reservation.getRoomId());
+            preparedStatement.setString(4, reservation.getStartDate());
+            preparedStatement.setString(5, reservation.getEndDate());
+            preparedStatement.setString(6, reservation.getStatus());
+            preparedStatement.executeUpdate();
         }
 
-    
-        // Other methods to remove or update reservations...
+        // Close the connection
+        connection.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
 }

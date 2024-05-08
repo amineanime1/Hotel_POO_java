@@ -10,18 +10,20 @@ public class Administrator extends User {
     private Map<Integer, Room> rooms = new HashMap<>();
     private Map<Integer, Reservation> reservations = new HashMap<>();
     private RoomManagement roomManagement;
-
+    private ReservationManagement reservationManagement;
 
     public Administrator(String username, String password) {
         super(username, password, true);
         this.usersManagement = new UsersManagement();
         this.roomManagement = new RoomManagement();
+        this.reservationManagement = new ReservationManagement();
         this.currentUser = null;
     }
 
-    public Administrator(String username, String password, RoomManagement roomManagement) {
+    public Administrator(String username, String password, RoomManagement roomManagement, ReservationManagement reservationManagement) {
         super(username, password, true);
         this.usersManagement = new UsersManagement();
+        this.reservationManagement = reservationManagement;
         this.roomManagement = roomManagement;
         this.currentUser = null;
     }
@@ -86,8 +88,8 @@ public class Administrator extends User {
         }
     }
     void manageReservations() {
-        // Iterate over the reservations HashMap
-        for (Reservation reservation : reservations.values()) {
+        // Iterate over the reservations HashMap in the ReservationManagement class
+        for (Reservation reservation : reservationManagement.getReservations().values()) {
             if (reservation.getStatus().equals("Pending")) {
                 System.out.println("Reservation ID: " + reservation.getId());
                 System.out.println("Username: " + reservation.getUsername());

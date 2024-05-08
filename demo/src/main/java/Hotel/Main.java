@@ -7,14 +7,29 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        UsersManagement userManager = new UsersManagement();
+        RoomManagement roomManagement = new RoomManagement();
+        UsersManagement userManagement = new UsersManagement();
+        ReservationManagement reservationManagement = new ReservationManagement();
         Application app = new Application();
+
+        app.getUsersManagement().loadUsersFromDatabase();
+    app.getRoomsManagement().loadRoomsFromDatabase();
+    app.getReservationManagement().loadReservationsFromDatabase();
+
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        app.getUsersManagement().saveUsersToDatabase();
+        app.getRoomsManagement().saveRoomsToDatabase();
+        app.getReservationManagement().saveReservationsToDatabase();
+    }));
+    // Run the application
+        Database db = new Database();
+        db.testConnection();
         
         int choice = 0;
         while (choice != 6) {
 
             System.out.println("1. Register\n2. Login\n3. Check Users Hashmap\n4. Check Rooms Hashmap\n" + //
-                                "5. Check Reservations Hashmap\n6. Quit");
+                    "5. Check Reservations Hashmap\n6. Quit");
 
             while (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Please enter a number.");
@@ -23,7 +38,7 @@ public class Main {
             choice = scanner.nextInt();
             scanner.nextLine();
 
-           if (choice == 1) {
+            if (choice == 1) {
                 // Register
                 boolean isRegistered = false;
                 while (!isRegistered) {
@@ -35,7 +50,7 @@ public class Main {
                     int roleChoice = scanner.nextInt();
                     scanner.nextLine();
                     boolean isAdmin = (roleChoice == 2);
-                    isRegistered =  app.register(username, password, isAdmin);
+                    isRegistered = app.register(username, password, isAdmin);
                     if (!isRegistered) {
                         System.out.println("Username already exists. Please enter another username.");
                     }
@@ -66,88 +81,89 @@ public class Main {
                             }
                         }
                     } else if (user instanceof Administrator) {
-    int adminChoice = 0;
-    while (adminChoice != 3) {
-        System.out.println("1. Manage reservations\n2. Manage rooms\n3. Quit");
-        while (!scanner.hasNextInt()) {
-            System.out.println("Invalid input. Please enter a number.");
-            scanner.next(); // Consume the invalid input
-        }
-        adminChoice = scanner.nextInt();
-        scanner.nextLine();
-        switch (adminChoice) {
-            case 1:
-                // Manage reservations
-                ((Administrator) user).manageReservations();
-                break;
-            case 2:
-                // Manage rooms
-                int roomChoice = 0;
-                while (roomChoice != 4) {
-                    System.out.println("1. Create room\n2. Modify room\n3. Delete room\n4. Back to main menu");
-                    while (!scanner.hasNextInt()) {
-                        System.out.println("Invalid input. Please enter a number.");
-                        scanner.next(); // Consume the invalid input
-                    }
-                    roomChoice = scanner.nextInt();
-                    scanner.nextLine();
-
-                    switch (roomChoice) {
-                        case 1:
-                            // Gather necessary information for room creation
-                            System.out.println("Enter room number:");
-                            int number = scanner.nextInt();
-                            scanner.nextLine();
-                            System.out.println("Enter room type:");
-                            String type = scanner.next();
-                            System.out.println("Enter room price:");
-                            double price = scanner.nextDouble();
-                            ((Administrator) user).createRoom(number, type, price);
-                            break;
-                        case 2:
-                            // Gather necessary information for room modification
-                            System.out.println("Enter room number to modify:");
-                            int numberToModify = scanner.nextInt();
-                            scanner.nextLine();
-                            System.out.println("Enter new room type:");
-                            String newType = scanner.next();
-                            System.out.println("Enter new room price:");
-                            double newPrice = scanner.nextDouble();
-                            ((Administrator) user).modifyRoom(numberToModify, newType, newPrice);
-                            break;
-                        case 3:
-                            // Gather necessary information for room deletion
-                            System.out.println("Enter room number to delete:");
-                            int numberToDelete = scanner.nextInt();
-                            scanner.nextLine();
-                            ((Administrator) user).deleteRoom(numberToDelete);
-                            break;
-                        default:
-                            if (roomChoice != 4) {
-                                System.out.println("Invalid choice.");
+                        int adminChoice = 0;
+                        while (adminChoice != 3) {
+                            System.out.println("1. Manage reservations\n2. Manage rooms\n3. Quit");
+                            while (!scanner.hasNextInt()) {
+                                System.out.println("Invalid input. Please enter a number.");
+                                scanner.next(); // Consume the invalid input
                             }
-                            break;
+                            adminChoice = scanner.nextInt();
+                            scanner.nextLine();
+                            switch (adminChoice) {
+                                case 1:
+                                    // Manage reservations
+                                    ((Administrator) user).manageReservations();
+                                    break;
+                                case 2:
+                                    // Manage rooms
+                                    int roomChoice = 0;
+                                    while (roomChoice != 4) {
+                                        System.out.println(
+                                                "1. Create room\n2. Modify room\n3. Delete room\n4. Back to main menu");
+                                        while (!scanner.hasNextInt()) {
+                                            System.out.println("Invalid input. Please enter a number.");
+                                            scanner.next(); // Consume the invalid input
+                                        }
+                                        roomChoice = scanner.nextInt();
+                                        scanner.nextLine();
+
+                                        switch (roomChoice) {
+                                            case 1:
+                                                // Gather necessary information for room creation
+                                                System.out.println("Enter room number:");
+                                                int number = scanner.nextInt();
+                                                scanner.nextLine();
+                                                System.out.println("Enter room type:");
+                                                String type = scanner.next();
+                                                System.out.println("Enter room price:");
+                                                double price = scanner.nextDouble();
+                                                ((Administrator) user).createRoom(number, type, price);
+                                                break;
+                                            case 2:
+                                                // Gather necessary information for room modification
+                                                System.out.println("Enter room number to modify:");
+                                                int numberToModify = scanner.nextInt();
+                                                scanner.nextLine();
+                                                System.out.println("Enter new room type:");
+                                                String newType = scanner.next();
+                                                System.out.println("Enter new room price:");
+                                                double newPrice = scanner.nextDouble();
+                                                ((Administrator) user).modifyRoom(numberToModify, newType, newPrice);
+                                                break;
+                                            case 3:
+                                                // Gather necessary information for room deletion
+                                                System.out.println("Enter room number to delete:");
+                                                int numberToDelete = scanner.nextInt();
+                                                scanner.nextLine();
+                                                ((Administrator) user).deleteRoom(numberToDelete);
+                                                break;
+                                            default:
+                                                if (roomChoice != 4) {
+                                                    System.out.println("Invalid choice.");
+                                                }
+                                                break;
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    if (adminChoice != 3) {
+                                        System.out.println("Invalid choice.");
+                                    }
+                                    break;
+                            }
+                        }
                     }
-                }
-                break;
-            default:
-                if (adminChoice != 3) {
-                    System.out.println("Invalid choice.");
-                }
-                break;
-        }
-    }
-}
                 } else {
                     System.out.println("Invalid username or password.");
                 }
-            } else if(choice == 3) {
+            } else if (choice == 3) {
                 // Print users
-                User.printUsers();
-            } else if(choice == 4) {
+                app.getUsersManagement().printUsers();
+            } else if (choice == 4) {
                 // Print rooms
                 app.getRoomsManagement().printRooms();
-            } else if(choice == 5) {
+            } else if (choice == 5) {
                 // Print reservations
                 app.getReservationManagement().printReservations();
             } else if (choice != 6) {
@@ -156,6 +172,9 @@ public class Main {
             }
         }
 
-        
+        app.getUsersManagement().saveUsersToDatabase();
+        app.getRoomsManagement().saveRoomsToDatabase();
+        app.getReservationManagement().saveReservationsToDatabase();
+
     }
 }
