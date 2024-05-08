@@ -10,6 +10,7 @@ public class Client extends User {
     private RoomManagement roomManagement;
     private ReservationManagement reservationManagement;
 
+   
     public Client(String username, String password) {
         super(username, password, false);
         this.usersManagement = new UsersManagement();
@@ -26,26 +27,26 @@ public class Client extends User {
         this.currentUser = null;
     }
     void authenticate(String username, String password) {
-        // Implement authentication logic
+        this.currentUser = usersManagement.login(username, password);
     }
-
     public void checkReservation(String username) {
-        for (Reservation reservation : reservations.values()) {
-            if (reservation.getUsername().equals(username)) {
-                System.out.println("Reservation details:");
-                System.out.println("ID: " + reservation.getId());
-                System.out.println("Room: " + reservation.getRoomId());
-                System.out.println("Start date: " + reservation.getStartDate());
-                System.out.println("End date: " + reservation.getEndDate());
-                System.out.println("Status: " + reservation.getStatus());
-                return;
+        // Assuming getReservations() returns a HashMap<Integer, Reservation>
+        Map<Integer, Reservation> reservations = reservationManagement.getReservations();
+    
+        for (Reservation res : reservations.values()) {
+            if (res.getUsername().equals(username)) {
+                System.out.printf("Reservation details - ID: %d, Room: %d, Start date: %s, End date: %s, Status: %s%n",
+                    res.getId(), res.getRoomId(), res.getStartDate(), res.getEndDate(), res.getStatus());
             }
         }
-        System.out.println("No reservation found.");
+        if (reservations.isEmpty()) {
+            System.out.println("No reservation found.");
+        }
     }
 
-    public void reserveRoom(String username) {
+    public void reserveRoom(User user) {
           // Check if the user is logged in
+          currentUser = user;
     if (currentUser == null) {
         System.out.println("User not logged in.");
         return;
@@ -75,7 +76,7 @@ public class Client extends User {
                 continue;
             }
         
-            System.out.println("ID: " + room.getId() + ", Number: " + room.getNumber() + ", Type: " + room.getType() + ", Price: " + room.getPrice());
+            System.out.println("Number: " + room.getNumber() + ", Type: " + room.getType() + ", Price: " + room.getPrice());
         }
 
         // Ask the user to enter the ID of the room they want to reserve

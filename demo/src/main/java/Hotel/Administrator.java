@@ -1,6 +1,8 @@
 package Hotel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -88,30 +90,38 @@ public class Administrator extends User {
         }
     }
     void manageReservations() {
+        // Create a list to store pending reservations
+        List<Reservation> pendingReservations = new ArrayList<>();
+
         // Iterate over the reservations HashMap in the ReservationManagement class
         for (Reservation reservation : reservationManagement.getReservations().values()) {
             if (reservation.getStatus().equals("Pending")) {
-                System.out.println("Reservation ID: " + reservation.getId());
-                System.out.println("Username: " + reservation.getUsername());
-                System.out.println("Room ID: " + reservation.getRoomId());
-                System.out.println("Status: " + reservation.getStatus());
-    
-                System.out.println("Enter 1 to accept, 2 to decline:");
-                Scanner scanner = new Scanner(System.in);
-                int choice = scanner.nextInt();
-                scanner.nextLine();
-    
-                if (choice == 1) {
-                    // Accept the reservation
-                    reservation.setStatus("Accepted");
-                    System.out.println("Reservation accepted.");
-                } else if (choice == 2) {
-                    // Decline the reservation
-                    reservation.setStatus("Declined");
-                    System.out.println("Reservation declined.");
-                } else {
-                    System.out.println("Invalid choice. Please enter 1 or 2.");
-                }
+                pendingReservations.add(reservation);
+                System.out.printf("Reservation details - ID: %d, Username: %s, Room ID: %d, Status: %s%n",
+                    reservation.getId(), reservation.getUsername(), reservation.getRoomId(), reservation.getStatus());
+            }
+        }
+        System.out.println("\nManage reservations :\n");
+        // Iterate over the list of pending reservations and prompt the administrator to accept or decline each one
+        for (Reservation reservation : pendingReservations) {
+            System.out.printf("Manage reservation - ID: %d, Username: %s, Room ID: %d, Status: %s%n",
+                reservation.getId(), reservation.getUsername(), reservation.getRoomId(), reservation.getStatus());
+
+            System.out.println("Enter 1 to accept, 2 to decline:");
+            Scanner scanner = new Scanner(System.in);
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            if (choice == 1) {
+                // Accept the reservation
+                reservation.setStatus("Accepted");
+                System.out.println("Reservation accepted.");
+            } else if (choice == 2) {
+                // Decline the reservation
+                reservation.setStatus("Declined");
+                System.out.println("Reservation declined.");
+            } else {
+                System.out.println("Invalid choice. Please enter 1 or 2.");
             }
         }
     }

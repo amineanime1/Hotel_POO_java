@@ -21,9 +21,10 @@ public class ReservationManagement {
     }
 
     public void printReservations() {
+        System.out.println("Existing Reservations");
         for (Map.Entry<Integer, Reservation> entry : reservations.entrySet()) {
             Reservation reservation = entry.getValue();
-            System.out.println("Reservation ID: " + reservation.getId() + ", Room Number: " + reservation.getRoomId() + ", User: " + reservation.getUsername() + ", Status: " + reservation.getStatus());
+            System.out.println("Reservation || ID: " + reservation.getId() + ", Room Number: " + reservation.getRoomId() + ", User: " + reservation.getUsername() + ", Status: " + reservation.getStatus());
         }
     }
 

@@ -26,10 +26,10 @@ public class Main {
         db.testConnection();
         
         int choice = 0;
-        while (choice != 6) {
+        while (choice != 7) {
 
             System.out.println("1. Register\n2. Login\n3. Check Users Hashmap\n4. Check Rooms Hashmap\n" + //
-                    "5. Check Reservations Hashmap\n6. Quit");
+                    "5. Check Reservations Hashmap\n6. Reseting data\n7. Quit");
 
             while (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Please enter a number.");
@@ -75,7 +75,8 @@ public class Main {
                             if (userChoice == 1) {
                                 ((Client) user).checkReservation(user.getUsername());
                             } else if (userChoice == 2) {
-                                ((Client) user).reserveRoom(user.getUsername());
+                                
+                                ((Client) user).reserveRoom(user);
                             } else if (userChoice != 3) {
                                 System.out.println("Invalid choice.");
                             }
@@ -166,12 +167,18 @@ public class Main {
             } else if (choice == 5) {
                 // Print reservations
                 app.getReservationManagement().printReservations();
-            } else if (choice != 6) {
-                // Invalid choice
-                System.out.println("Invalid choice. Please enter a number between 1 and 6.");
+            } else if (choice == 6) {
+                System.out.println("Cleaning everything...");
+                app.getRoomsManagement().getRooms().clear();
+                app.getUsersManagement().getUsers().clear();
+                app.getReservationManagement().getReservations().clear();
+            }else if (choice != 7) {
+                     // Invalid choice
+                System.out.println("Invalid choice. Please enter a number between 1 and 7.");
+
             }
         }
-
+        
         app.getUsersManagement().saveUsersToDatabase();
         app.getRoomsManagement().saveRoomsToDatabase();
         app.getReservationManagement().saveReservationsToDatabase();
