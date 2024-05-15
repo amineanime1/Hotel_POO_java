@@ -1,4 +1,4 @@
-package Hotel;
+package Model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,7 +89,7 @@ public class Administrator extends User {
             System.out.println("No room found with the entered number.");
         }
     }
-    void manageReservations() {
+    public void manageReservations() {
         // Create a list to store pending reservations
         List<Reservation> pendingReservations = new ArrayList<>();
 

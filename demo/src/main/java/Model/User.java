@@ -1,4 +1,4 @@
-package Hotel;
+package Model;
 
 public class User {
     private static int idCounter = 0;
