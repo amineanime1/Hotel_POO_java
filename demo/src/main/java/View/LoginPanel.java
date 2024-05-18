@@ -1,89 +1,129 @@
-// LoginPanel.java
 package View;
 
 import javax.swing.*;
 import java.awt.*;
-import Model.Application;
-import Model.User;
 
 public class LoginPanel extends JPanel {
-    private JTextField usernameField;
-    private JPasswordField passwordField;
-    private Application app;
-    private LoginListener loginListener;
+    public LoginPanel() {
+        setBackground(Color.WHITE);
+        setLayout(null);
 
-    public LoginPanel(Application app) {
-        JPanel panel = new JPanel(new GridBagLayout());
-        this.app = app;
-        this.loginListener = loginListener;
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        // Add welcome label
+        JLabel welcomeLabel = new JLabel("Welcome", JLabel.CENTER);
+        welcomeLabel.setFont(new Font("Serif", Font.BOLD, 80)); // Increase font size
+        welcomeLabel.setBounds(0, 60, 800, 100); // Adjust bounds
+        welcomeLabel.setForeground(Color.decode("#006281")); // Change text color
+        add(welcomeLabel);
 
-        JLabel usernameLabel = new JLabel("Username:");
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(usernameLabel, gbc);
+        JLabel usernameLabel = new JLabel("username");
+        usernameLabel.setBounds(200, 200, 400, 50); // Adjust bounds
+        usernameLabel.setFont(new Font("", Font.BOLD, 20)); // Increase font size
+        usernameLabel.setForeground(Color.decode("#006281")); // Change text color
+        add(usernameLabel);
 
-        usernameField = new JTextField(20);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        panel.add(usernameField, gbc);
+        RoundedTextField usernameField = new RoundedTextField();
+        usernameField.setBounds(200, 250, 400, 70); // Increase height
+        usernameField.setBackground(new Color(0, 191, 255)); // Change background color
+        usernameField.setFont(new Font("", Font.PLAIN, 15)); // Increase font size to make it bolder
+        usernameField.setForeground(Color.BLACK); // Change text color
+        add(usernameField);
 
-        JLabel passwordLabel = new JLabel("Password:");
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        panel.add(passwordLabel, gbc);
+        // Add password label and text field
+        JLabel passwordLabel = new JLabel("password");
+        passwordLabel.setBounds(200, 320, 400, 50); // Adjust bounds
+        passwordLabel.setFont(new Font("", Font.BOLD, 20)); // Increase font size
+        passwordLabel.setForeground(Color.decode("#006281")); // Change text color
+        add(passwordLabel);
 
-        passwordField = new JPasswordField(20);
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        panel.add(passwordField, gbc);
+        RoundedPasswordField passwordField = new RoundedPasswordField();
+        passwordField.setBounds(200, 370, 400, 70); // Increase height
+        passwordField.setBackground(new Color(0, 191, 255)); // Change background color
+        passwordField.setFont(new Font("", Font.PLAIN, 15)); // Increase font size to make it bolder
+        passwordField.setForeground(Color.BLACK); // Change text color
+        add(passwordField);
 
-        JButton loginButton = new JButton("Login");
-        loginButton.addActionListener(e -> {
-            String username = usernameField.getText();
-            String password = String.valueOf(passwordField.getPassword());
-
-            User user = app.login(username, password);
-            if (user != null) {
-                loginListener.onLogin(user);
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        panel.add(loginButton, gbc);
-
+        // Add register and login buttons
         JButton registerButton = new JButton("Register");
-        registerButton.addActionListener(e -> {
-            String username = usernameField.getText();
-            String password = String.valueOf(passwordField.getPassword());
+        registerButton.setBounds(200, 450, 100, 30);
+        registerButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        registerButton.setForeground(Color.decode("#00bfff"));
+        registerButton.setBackground(Color.WHITE);
+        registerButton.setBorderPainted(false);
+        add(registerButton);
 
-            if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(MainFrame.this, "Username and password cannot be empty.", "Registration Failed", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        JButton loginButton = new JButton("Log-in");
+        loginButton.setBounds(500, 450, 100, 30);
+        loginButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        loginButton.setForeground(Color.decode("#00bfff"));
+        loginButton.setBackground(Color.WHITE);
+        loginButton.setBorderPainted(false);
+        add(loginButton);
 
-            String[] options = {"Regular User", "Administrator"};
-            int choice = JOptionPane.showOptionDialog(MainFrame.this, "Select your role:", "Role Selection", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        // Add circles to bottom corners
+        JPanel leftCircle = new CirclePanel();
+        leftCircle.setBounds(-40, 500, 100, 100);
+        leftCircle.setBackground(Color.WHITE); // Change background color to white
+        add(leftCircle);
 
-            boolean isAdmin = (choice == 1);
+        JPanel rightCircle = new CirclePanel();
+        rightCircle.setBounds(725, 500, 100, 100);
+        rightCircle.setBackground(Color.WHITE); // Change background color to white
+        add(rightCircle);
+    }
 
-            boolean isRegistered = app.register(username, password, isAdmin);
-            if (isRegistered) {
-                JOptionPane.showMessageDialog(MainFrame.this, "Registration successful!");
-            } else {
-                JOptionPane.showMessageDialog(MainFrame.this, "Username already exists. Please enter another username.", "Registration Failed", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        panel.add(registerButton, gbc);
+    class RoundedTextField extends JTextField {
+        RoundedTextField() {
+            setOpaque(false);
+            setBorder(new RoundedCornerBorder(20)); // Increase corner radius
+        }
 
-        return panel;
+        protected void paintComponent(Graphics g) {
+            g.setColor(getBackground());
+            g.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20); // Increase corner radius
+            super.paintComponent(g);
+        }
+    }
+
+    class RoundedPasswordField extends JPasswordField {
+        RoundedPasswordField() {
+            setOpaque(false);
+            setBorder(new RoundedCornerBorder(20)); // Increase corner radius to 20
+        }
+
+        protected void paintComponent(Graphics g) {
+            g.setColor(getBackground());
+            g.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20); // Increase corner radius to 20
+            super.paintComponent(g);
+        }
+    }
+
+    class CirclePanel extends JPanel {
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.decode("#008CB8"));
+            g.fillOval(0, 0, 100, 100);
+        }
+    }
+
+    class RoundedCornerBorder extends javax.swing.border.AbstractBorder {
+        private int radius;
+
+        RoundedCornerBorder(int radius) {
+            this.radius = radius;
+        }
+
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            g.setColor(Color.decode("#006281")); // Change border color
+            g.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
+        }
+
+        public Insets getBorderInsets(Component c) {
+            return new Insets(radius + 1, radius + 1, radius + 1, radius + 1);
+        }
+
+        public Insets getBorderInsets(Component c, Insets insets) {
+            insets.left = insets.top = insets.right = insets.bottom = radius + 1;
+            return insets;
+        }
     }
 }

@@ -1,40 +1,55 @@
-// MainFrame.java
 package View;
+
+import Controller.RoomController;
+import Model.RoomManagement;
+import View.LoginPanel;
+import View.ReserveRoomPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import Model.Application;
 
 public class MainFrame extends JFrame {
-    private JPanel mainPanel;
     private LoginPanel loginPanel;
-    private MenuPanel menuPanel;
-    private Application app;
+    private ReserveRoomPanel reserveRoomPanel;
+    private RoomManagement roomManagement;
+    private RoomController roomController;
 
     public MainFrame() {
-        setTitle("Hotel Management System");
+        setTitle("Hotel Ayaram");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
-        setLocationRelativeTo(null);
+        setLayout(new CardLayout());
 
-        app = new Application();
+        // Initialize the room management model
+        roomManagement = new RoomManagement();
+        roomManagement.loadRoomsFromDatabase(); // Load existing rooms from the database
 
-        mainPanel = new JPanel(new CardLayout());
-        loginPanel = new LoginPanel(app);
-        menuPanel = new MenuPanel();
+        // Create the login panel
+        loginPanel = new LoginPanel();
+        
+        // Create the reserve room panel
+        reserveRoomPanel = new ReserveRoomPanel(this);
+        
+        // Initialize the room controller
+        roomController = new RoomController(roomManagement, reserveRoomPanel);
 
-        mainPanel.add(loginPanel, "loginPanel");
-        mainPanel.add(menuPanel, "menuPanel");
+        // Add panels to the frame
+        add(loginPanel, "login");
+        add(reserveRoomPanel, "reserveRoom");
 
-        add(mainPanel);
-        pack();
-        setLocationRelativeTo(null);
+        // Show the login panel first
+        switchToPanel("reserveRoom");
+
+        // For demonstration purposes, switch to the reserve room panel after login (you should implement proper login logic)
+        // loginPanel.addLoginButtonListener(e -> switchToPanel("reserveRoom"));
+    }
+
+    public void switchToPanel(String panelName) {
+        CardLayout layout = (CardLayout) getContentPane().getLayout();
+        layout.show(getContentPane(), panelName);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            MainFrame mainFrame = new MainFrame();
-            mainFrame.setVisible(true);
-        });
+        SwingUtilities.invokeLater(MainFrame::new);
     }
 }
