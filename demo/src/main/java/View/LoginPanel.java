@@ -126,4 +126,11 @@ public class LoginPanel extends JPanel {
             return insets;
         }
     }
+    public static void main(String[] args) {
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.add(new LoginPanel());
+        frame.setVisible(true);
+    }
 }

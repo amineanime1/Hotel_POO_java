@@ -28,6 +28,8 @@ public class RoomManagement {
     
         // Add the room to the map
         rooms.put(room.getNumber(), room);
+        saveRoomsToDatabase();
+
     }
     public Map<Integer, Room> getRooms() {
         return rooms;
