@@ -4,11 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 
-public class PopupDialog extends JDialog {
+public class PopupReserveDialog extends JDialog {
 
     private JButton okButton; // Declare okButton as an instance variable
 
-    public PopupDialog(JFrame frame) {
+    public PopupReserveDialog(JFrame frame) {
     super(frame, true);
     setSize(400, 300);
     setUndecorated(true);

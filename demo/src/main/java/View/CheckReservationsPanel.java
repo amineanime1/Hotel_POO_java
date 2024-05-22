@@ -1,5 +1,6 @@
 package View;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -7,40 +8,39 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
-public class ReserveRoomPanel extends JPanel {
-    
+public class CheckReservationsPanel extends JPanel {
+
     private JDialog popupDialog;
     private JPanel overlayPanel;
-    private JButton reserveRoomButton;
+    private JButton modifyReservationButton;
     private JButton backButton;
-    private JTextField roomNumberField;
-    private JTextField dateField;
 
-    public ReserveRoomPanel(JFrame frame) {
+    public CheckReservationsPanel(JFrame frame) {
         setBackground(Color.WHITE);
         setLayout(null);
 
-        // Add reserve a room label
-        JLabel reserveLabel = new JLabel("Reserve a room", JLabel.LEFT);
-        reserveLabel.setFont(new Font("Serif", Font.BOLD, 50)); // Set font size
-        reserveLabel.setBounds(50, 30, 400, 60); // Adjust bounds
-        reserveLabel.setForeground(Color.decode("#006281")); // Change text color
-        add(reserveLabel);
+        // Add check reservations label
+        JLabel checkReservationsLabel = new JLabel("Check reservations", JLabel.LEFT);
+        checkReservationsLabel.setFont(new Font("Serif", Font.BOLD, 50));
+        checkReservationsLabel.setBounds(50, 30, 500, 60);
+        checkReservationsLabel.setForeground(Color.decode("#006281"));
+        add(checkReservationsLabel);
 
-        // Add available rooms label
-        JLabel availableRoomsLabel = new JLabel("Available rooms");
-        availableRoomsLabel.setBounds(50, 100, 300, 50); // Adjust bounds
-        availableRoomsLabel.setFont(new Font("SansSerif", Font.PLAIN, 20)); // Set font size
-        availableRoomsLabel.setForeground(Color.decode("#006281")); // Change text color
-        add(availableRoomsLabel);
+        // Add your reservations label
+        JLabel yourReservationsLabel = new JLabel("your reservations");
+        yourReservationsLabel.setBounds(50, 100, 300, 50);
+        yourReservationsLabel.setFont(new Font("SansSerif", Font.PLAIN, 20));
+        yourReservationsLabel.setForeground(Color.decode("#006281"));
+        add(yourReservationsLabel);
 
         // Create table for rooms
-        String[] columnNames = { "Number", "Type", "Price" };
+        String[] columnNames = { "Number", "Type", "Price", "Date" };
         Object[][] data = {
-                { "102", "Dual", "2500 Dzd" },
-                { "103", "Small", "1000 Dzd" },
-                { "105", "Solo", "2000 Dzd" }
+            { "102", "Dual", "2500 Dzd", "11/05/2024" },
+            { "103", "Small", "1000 Dzd", "12/05/2024" },
+            { "105", "Solo", "2000 Dzd", "15/05/2024" }
         };
 
         JTable roomTable = new JTable(data, columnNames) {
@@ -52,9 +52,8 @@ public class ReserveRoomPanel extends JPanel {
             @Override
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
-                c.setBackground(row % 2 == 0 ? Color.decode("#00bfff") : Color.decode("#00ccff")); // Alternating row
-                                                                                                   // colors
-                ((JComponent) c).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
+                c.setBackground(row % 2 == 0 ? Color.decode("#00bfff") : Color.decode("#00ccff"));
+                ((JComponent) c).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 return c;
             }
         };
@@ -73,7 +72,7 @@ public class ReserveRoomPanel extends JPanel {
 
         // Add scroll pane
         JScrollPane scrollPane = new JScrollPane(roomTable);
-        scrollPane.setBounds(50, 160, 700, 200); // Adjust bounds for fixed size
+        scrollPane.setBounds(50, 160, 700, 200);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setOpaque(false);
@@ -88,46 +87,45 @@ public class ReserveRoomPanel extends JPanel {
         };
         roundedPanel.setLayout(new BorderLayout());
         roundedPanel.add(scrollPane);
-        roundedPanel.setBounds(50, 160, 700, 200); // Adjust bounds for fixed size
+        roundedPanel.setBounds(50, 160, 700, 200);
         add(roundedPanel);
 
         // Add back button
         backButton = new JButton("<- back");
-        backButton.setBounds(50, 400, 100, 50); // Adjust bounds
-        backButton.setFont(new Font("SansSerif", Font.PLAIN, 20)); // Set font size
-        backButton.setForeground(Color.decode("#00bfff")); // Change text color
+        backButton.setBounds(50, 400, 100, 50);
+        backButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
+        backButton.setForeground(Color.decode("#00bfff"));
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
         add(backButton);
 
-        // Add reserve a room button
-        reserveRoomButton = new JButton("reserve a room");
-        reserveRoomButton.setBounds(600, 400, 200, 50); // Adjust bounds
-        reserveRoomButton.setFont(new Font("SansSerif", Font.PLAIN, 20)); // Set font size
-        reserveRoomButton.setForeground(Color.decode("#00bfff")); // Change text color
-        reserveRoomButton.setContentAreaFilled(false);
-        reserveRoomButton.setBorderPainted(false);
-        add(reserveRoomButton);
+        // Add modify a reservation button
+        modifyReservationButton = new JButton("modify a reservation");
+        modifyReservationButton.setBounds(600, 400, 200, 50);
+        modifyReservationButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
+        modifyReservationButton.setForeground(Color.decode("#00bfff"));
+        modifyReservationButton.setContentAreaFilled(false);
+        modifyReservationButton.setBorderPainted(false);
+        add(modifyReservationButton);
 
         // Add circles to bottom corners
         JPanel leftCircle = new CirclePanel();
         leftCircle.setBounds(-40, 500, 100, 100);
-        leftCircle.setBackground(Color.WHITE); // Change background color to white
+        leftCircle.setBackground(Color.WHITE);
         add(leftCircle);
 
         JPanel rightCircle = new CirclePanel();
         rightCircle.setBounds(725, 500, 100, 100);
-        rightCircle.setBackground(Color.WHITE); // Change background color to white
+        rightCircle.setBackground(Color.WHITE);
         add(rightCircle);
 
-        // Add action listener to reserve room button
-        reserveRoomButton.addActionListener(e -> showPopup(frame));
+        // Add action listener to modify reservation button
+        modifyReservationButton.addActionListener(e -> showPopup(frame));
 
-        // Remove PopupDialog type declaration
-        popupDialog = new PopupReserveDialog(frame);
+        // Initialize PopupDialog and overlay panel
+        popupDialog = new PopupCheckReserveDialog(frame);
         popupDialog.setVisible(false);
 
-        // Create overlay panel
         overlayPanel = new JPanel();
         overlayPanel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
         overlayPanel.setBackground(new Color(0, 0, 0, 100));
@@ -153,10 +151,12 @@ public class ReserveRoomPanel extends JPanel {
             }
         });
 
-        // Add action listener to okButton
+        // Add action listener to OK button in popup dialog to close popup and hide overlay
         // popupDialog.getOkButton().addActionListener(e -> {
         //     popupDialog.setVisible(false);
         //     overlayPanel.setVisible(false);
+        //     frame.requestFocus();
+        //     frame.repaint();
         // });
     }
 
@@ -173,26 +173,20 @@ public class ReserveRoomPanel extends JPanel {
             g.fillOval(0, 0, 100, 100);
         }
     }
+
     public void addReserveRoomListener(ActionListener listener) {
-        reserveRoomButton.addActionListener(listener);
+        modifyReservationButton.addActionListener(listener);
     }
 
     public void addBackListener(ActionListener listener) {
         backButton.addActionListener(listener);
     }
 
-    public String getRoomNumber() {
-        return roomNumberField.getText();
-    }
-
-    public String getDate() {
-        return dateField.getText();
-    }
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
-        frame.add(new ReserveRoomPanel(frame));
+        frame.add(new CheckReservationsPanel(frame));
         frame.setVisible(true);
     }
 }

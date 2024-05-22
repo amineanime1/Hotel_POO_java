@@ -5,8 +5,10 @@ import Model.RoomManagement;
 import View.LoginPanel;
 import View.ReserveRoomPanel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class MainFrame extends JFrame {
     private LoginPanel loginPanel;
@@ -18,6 +20,14 @@ public class MainFrame extends JFrame {
         setTitle("Hotel Ayaram");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
+
+         try {
+            Image icon = ImageIO.read(getClass().getResource("/logo_png.png"));
+            setIconImage(icon);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         setLayout(new CardLayout());
 
         // Initialize the room management model
