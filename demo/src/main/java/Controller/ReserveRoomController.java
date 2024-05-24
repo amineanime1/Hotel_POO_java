@@ -7,7 +7,6 @@ import View.PopupReserveDialog;
 import View.ReserveRoomPanel;
 
 import javax.swing.*;
-
 import java.awt.CardLayout;
 import java.util.function.Consumer;
 
@@ -21,10 +20,10 @@ public class ReserveRoomController {
     private PopupReserveDialog reserveDialog;
     private Consumer<Reservation> reserveSuccessListener;
 
-    public ReserveRoomController(JFrame mainFrame, ReservationManagement reservationManagement, PopupReserveDialog reserveDialog, ReserveRoomPanel reserveRoomPanel ,HomeClientPanel homeClientPanel) {
+    public ReserveRoomController(JFrame mainFrame, ReservationManagement reservationManagement, PopupReserveDialog reserveDialog, ReserveRoomPanel reserveRoomPanel, JPanel cardPanel, CardLayout cardLayout) {
         this.mainFrame = mainFrame;
-        this.cardPanel = (JPanel) mainFrame.getContentPane();
-        this.cardLayout = (CardLayout) cardPanel.getLayout();
+        this.cardPanel = cardPanel;
+        this.cardLayout = cardLayout;
         this.reservationManagement = reservationManagement;
         this.reserveDialog = reserveDialog;
         this.reserveDialog.setReserveRoomController(this);
