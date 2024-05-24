@@ -6,12 +6,12 @@ import java.util.Scanner;
 import Model.RoomManagement;
 import Model.User;
 import Model.UsersManagement;
+import View.LoginPanel;
 import Model.ReservationManagement;
 import Model.Administrator;
 import Model.Application;
 import Model.Client;
 import Model.Database;
-import View.MainFrame;
 
 public class Main {
     public static void main(String[] args) {
@@ -34,7 +34,7 @@ public class Main {
         Database db = new Database();
         db.testConnection();
         
-        MainFrame mainFrame = new MainFrame();
+        LoginPanel mainFrame = new LoginPanel();
         mainFrame.setVisible(true);
         
         int choice = 0;

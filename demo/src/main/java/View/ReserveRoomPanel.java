@@ -9,13 +9,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ReserveRoomPanel extends JPanel {
-    
+
     private JDialog popupDialog;
     private JPanel overlayPanel;
     private JButton reserveRoomButton;
     private JButton backButton;
-    private JTextField roomNumberField;
-    private JTextField dateField;
+    private PopupReserveDialog popupReserveDialog;
+    private String currentUsername;
 
     public ReserveRoomPanel(JFrame frame) {
         setBackground(Color.WHITE);
@@ -27,7 +27,7 @@ public class ReserveRoomPanel extends JPanel {
         reserveLabel.setBounds(50, 30, 400, 60); // Adjust bounds
         reserveLabel.setForeground(Color.decode("#006281")); // Change text color
         add(reserveLabel);
-
+// 
         // Add available rooms label
         JLabel availableRoomsLabel = new JLabel("Available rooms");
         availableRoomsLabel.setBounds(50, 100, 300, 50); // Adjust bounds
@@ -120,12 +120,9 @@ public class ReserveRoomPanel extends JPanel {
         rightCircle.setBackground(Color.WHITE); // Change background color to white
         add(rightCircle);
 
-        // Add action listener to reserve room button
-        reserveRoomButton.addActionListener(e -> showPopup(frame));
-
-        // Remove PopupDialog type declaration
-        popupDialog = new PopupReserveDialog(frame);
-        popupDialog.setVisible(false);
+        // Initialize the popup dialog
+        popupReserveDialog = new PopupReserveDialog(frame);
+        popupReserveDialog.setVisible(false);
 
         // Create overlay panel
         overlayPanel = new JPanel();
@@ -135,7 +132,7 @@ public class ReserveRoomPanel extends JPanel {
         overlayPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                popupDialog.setVisible(false);
+                popupReserveDialog.setVisible(false);
                 overlayPanel.setVisible(false);
             }
         });
@@ -146,24 +143,20 @@ public class ReserveRoomPanel extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (popupDialog.isVisible() && !popupDialog.getBounds().contains(e.getPoint())) {
-                    popupDialog.setVisible(false);
+                if (popupReserveDialog.isVisible() && !popupReserveDialog.getBounds().contains(e.getPoint())) {
+                    popupReserveDialog.setVisible(false);
                     overlayPanel.setVisible(false);
                 }
             }
         });
 
-        // Add action listener to okButton
-        // popupDialog.getOkButton().addActionListener(e -> {
-        //     popupDialog.setVisible(false);
-        //     overlayPanel.setVisible(false);
-        // });
-    }
-
-    private void showPopup(JFrame frame) {
-        overlayPanel.setVisible(true);
-        popupDialog.setLocationRelativeTo(frame);
-        popupDialog.setVisible(true);
+        // Add action listener to reserveRoomButton to show popup
+        reserveRoomButton.addActionListener(e -> {
+            overlayPanel.setVisible(true);
+            popupReserveDialog.setLocationRelativeTo(frame);
+            popupReserveDialog.setUsername(currentUsername);  // Set the current username to the dialog
+            popupReserveDialog.setVisible(true);
+        });
     }
 
     class CirclePanel extends JPanel {
@@ -173,6 +166,7 @@ public class ReserveRoomPanel extends JPanel {
             g.fillOval(0, 0, 100, 100);
         }
     }
+
     public void addReserveRoomListener(ActionListener listener) {
         reserveRoomButton.addActionListener(listener);
     }
@@ -181,18 +175,8 @@ public class ReserveRoomPanel extends JPanel {
         backButton.addActionListener(listener);
     }
 
-    public String getRoomNumber() {
-        return roomNumberField.getText();
+    public void setCurrentUsername(String username) {
+        this.currentUsername = username;
     }
 
-    public String getDate() {
-        return dateField.getText();
-    }
-    public static void main(String[] args) {
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
-        frame.add(new ReserveRoomPanel(frame));
-        frame.setVisible(true);
-    }
 }

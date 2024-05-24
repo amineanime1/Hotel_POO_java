@@ -1,66 +1,88 @@
 package Main;
 
 import Model.Application;
+import Model.ReservationManagement;
 import View.LoginPanel;
 import View.HomeClientPanel;
+import View.ReserveRoomPanel;
+import View.CheckReservationsPanel;
+import View.PopupReserveDialog;
 import Controller.LoginController;
 import Controller.DataController;
+import Controller.ClientHomeController;
+import Controller.ReserveRoomController;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
-import com.mysql.cj.log.Log;
-
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.awt.Image;
-import java.awt.*;
 
 public class MainGUITest {
     public static void main(String[] args) {
-    CardLayout cardLayout = new CardLayout();
-    JPanel cardPanel = new JPanel(cardLayout);
+        JFrame frame = new JFrame();
+        CardLayout cardLayout = new CardLayout();
+        JPanel cardPanel = new JPanel(cardLayout);
 
-    Application model = new Application();
-    LoginPanel loginView = new LoginPanel();
-    HomeClientPanel homeView = new HomeClientPanel();
-    LoginController loginController = new LoginController(model, loginView);
+        Application model = new Application();
+        ReservationManagement reservationManagement = new ReservationManagement();
 
-    // Create and use the DataController to load data
-    JFrame frame = new JFrame(); // Declare and initialize the frame variable
+        LoginPanel loginView = new LoginPanel();
+        HomeClientPanel homeView = new HomeClientPanel();
+        ReserveRoomPanel reserveRoomPanel = new ReserveRoomPanel(frame);
+        CheckReservationsPanel checkReservationsPanel = new CheckReservationsPanel(frame);
+        PopupReserveDialog reserveDialog = new PopupReserveDialog(frame);
 
-    DataController dataController = new DataController(model);
-    dataController.loadData();
+        LoginController loginController = new LoginController(model, loginView);
+        DataController dataController = new DataController(model);
 
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(800, 600);
+        // Load data
+        dataController.loadData();
+        reservationManagement.loadReservationsFromDatabase();
 
-    try {
-        Image icon = ImageIO.read(MainGUITest.class.getResource("images/logov4.png"));
-        frame.setIconImage(icon);
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
 
-    cardPanel.add(loginView, "LoginPanel");
-    cardPanel.add(homeView, "HomeClientPanel");
-
-    frame.add(cardPanel);
-    frame.setVisible(true);
-
-    // Add a listener to save data when the application closes
-    frame.addWindowListener(new WindowAdapter() {
-        @Override
-        public void windowClosing(WindowEvent e) {
-        dataController.saveData();
-        super.windowClosing(e);
+        try {
+            Image icon = ImageIO.read(MainGUITest.class.getResource("images/logov4.png"));
+            frame.setIconImage(icon);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    });
 
-    // Assuming the LoginController has a method to set a successful login listener
-    loginController.setLoginSuccessListener(() -> {
-        cardLayout.show(cardPanel, "HomeClientPanel");
-    });
+        cardPanel.add(loginView, "LoginPanel");
+        cardPanel.add(homeView, "HomeClientPanel");
+        cardPanel.add(reserveRoomPanel, "ReserveRoomPanel");
+        cardPanel.add(checkReservationsPanel, "CheckReservationsPanel");
+
+        frame.setContentPane(cardPanel);
+        frame.setVisible(true);
+
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                dataController.saveData();
+                reservationManagement.saveReservationsToDatabase();
+                super.windowClosing(e);
+            }
+        });
+
+        ClientHomeController clientHomeController = new ClientHomeController(frame, homeView, reserveRoomPanel, checkReservationsPanel, loginView);
+
+        loginController.setLoginSuccessListener(username -> {
+            clientHomeController.setCurrentUsername(username);
+            cardLayout.show(cardPanel, "HomeClientPanel");
+        });
+
+        ReserveRoomController reserveRoomController = new ReserveRoomController(reservationManagement, reserveDialog);
+        reserveRoomController.setReserveSuccessListener(reservation -> {
+            reservationManagement.addReservation(reservation);
+            // checkReservationsPanel.updateReservations(reservationManagement.getReservations());
+            cardLayout.show(cardPanel, "CheckReservationsPanel");
+        });
+
+        // Assuming you have some way to open the reserve dialog, e.g., a button in HomeClientPanel
+     
     }
 }

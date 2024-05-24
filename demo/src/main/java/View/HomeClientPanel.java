@@ -2,9 +2,11 @@ package View;
 
 import javax.swing.*;
 import java.awt.*;
-
+import java.awt.event.ActionListener;
 public class HomeClientPanel extends JPanel {
-
+    private JButton reserveButton;
+    private JButton checkButton;
+    private JButton logoutLabel;
     private JPanel roundedRectangle;
 
     public HomeClientPanel() {
@@ -19,7 +21,7 @@ public class HomeClientPanel extends JPanel {
         add(welcomeLabel);
 
         // Add reserve a room link
-        JButton reserveButton = new JButton("Reserve a room");
+        reserveButton = new JButton("Reserve a room");
         reserveButton.setBounds(50, 230, 300, 50); // Adjust bounds
         reserveButton.setFont(new Font("SansSerif", Font.PLAIN, 20)); // Set font size
         reserveButton.setForeground(Color.decode("#006281")); // Change text color
@@ -30,7 +32,7 @@ public class HomeClientPanel extends JPanel {
         add(reserveButton);
         
         // Add check reservations link
-        JButton checkButton = new JButton("Check reservations");
+        checkButton = new JButton("Check reservations");
         checkButton.setBounds(50, 280, 300, 50); // Adjust bounds
         checkButton.setFont(new Font("SansSerif", Font.PLAIN, 20)); // Set font size
         checkButton.setForeground(Color.decode("#006281")); // Change text color
@@ -41,7 +43,7 @@ public class HomeClientPanel extends JPanel {
         add(checkButton);
 
         // Add log-out link
-        JButton logoutLabel = new JButton("Log-out");
+        logoutLabel = new JButton("Log-out");
         logoutLabel.setBounds(40, 400, 300, 50); // Adjust bounds
         logoutLabel.setFont(new Font("SansSerif", Font.PLAIN, 20)); // Set font size
         logoutLabel.setForeground(Color.decode("#00bfff")); // Change text color
@@ -68,7 +70,17 @@ public class HomeClientPanel extends JPanel {
         roundedRectangle.setBackground(Color.decode("#00bfff")); // Set background color
         add(roundedRectangle);
     }
+    public void addReserveButtonListener(ActionListener listener) {
+        reserveButton.addActionListener(listener);
+    }
 
+    public void addCheckButtonListener(ActionListener listener) {
+        checkButton.addActionListener(listener);
+    }
+
+    public void addLogoutButtonListener(ActionListener listener) {
+        logoutLabel.addActionListener(listener);
+    }
     class CirclePanel extends JPanel {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
