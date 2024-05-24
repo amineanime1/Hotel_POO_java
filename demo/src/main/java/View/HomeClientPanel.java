@@ -147,11 +147,4 @@ public class HomeClientPanel extends JPanel {
         int rectangleHeight = roundedRectangle.getHeight();
         roundedRectangle.setLocation(roundedRectangle.getX(), windowHeight - rectangleHeight);
     }
-    public static void main(String[] args) {
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
-        frame.add(new HomeClientPanel());
-        frame.setVisible(true);
-    }
 }

@@ -2,6 +2,7 @@ package Main;
 
 import Model.Application;
 import Model.ReservationManagement;
+import Model.RoomManagement;
 import View.LoginPanel;
 import View.HomeClientPanel;
 import View.ReserveRoomPanel;
@@ -26,11 +27,12 @@ public class MainGUITest {
         JPanel cardPanel = new JPanel(cardLayout);
 
         Application model = new Application();
-        ReservationManagement reservationManagement = new ReservationManagement();
+        ReservationManagement reservationManagement = model.getReservationManagement();
+        RoomManagement roomManagement = model.getRoomsManagement();
 
+        
         LoginPanel loginView = new LoginPanel();
-        HomeClientPanel homeView = new HomeClientPanel();
-        ReserveRoomPanel reserveRoomPanel = new ReserveRoomPanel(frame);
+        HomeClientPanel homeClientView = new HomeClientPanel();
         CheckReservationsPanel checkReservationsPanel = new CheckReservationsPanel(frame);
         PopupReserveDialog reserveDialog = new PopupReserveDialog(frame);
 
@@ -40,6 +42,8 @@ public class MainGUITest {
         // Load data
         dataController.loadData();
         reservationManagement.loadReservationsFromDatabase();
+
+        ReserveRoomPanel reserveRoomPanel = new ReserveRoomPanel(frame, reservationManagement, roomManagement);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
@@ -52,7 +56,7 @@ public class MainGUITest {
         }
 
         cardPanel.add(loginView, "LoginPanel");
-        cardPanel.add(homeView, "HomeClientPanel");
+        cardPanel.add(homeClientView, "HomeClientPanel");
         cardPanel.add(reserveRoomPanel, "ReserveRoomPanel");
         cardPanel.add(checkReservationsPanel, "CheckReservationsPanel");
 
@@ -68,21 +72,23 @@ public class MainGUITest {
             }
         });
 
-        ClientHomeController clientHomeController = new ClientHomeController(frame, homeView, reserveRoomPanel, checkReservationsPanel, loginView);
+        ClientHomeController clientHomeController = new ClientHomeController(frame, homeClientView, reserveRoomPanel, checkReservationsPanel, loginView);
 
         loginController.setLoginSuccessListener(username -> {
             clientHomeController.setCurrentUsername(username);
             cardLayout.show(cardPanel, "HomeClientPanel");
         });
 
-        ReserveRoomController reserveRoomController = new ReserveRoomController(reservationManagement, reserveDialog);
+        ReserveRoomController reserveRoomController = new ReserveRoomController(frame, reservationManagement, reserveDialog, reserveRoomPanel, homeClientView);
         reserveRoomController.setReserveSuccessListener(reservation -> {
             reservationManagement.addReservation(reservation);
             // checkReservationsPanel.updateReservations(reservationManagement.getReservations());
             cardLayout.show(cardPanel, "CheckReservationsPanel");
         });
 
+        reserveDialog.setReserveRoomController(reserveRoomController); // Ensure this is called
+
         // Assuming you have some way to open the reserve dialog, e.g., a button in HomeClientPanel
-     
+
     }
 }

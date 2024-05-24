@@ -10,7 +10,7 @@ public class PopupReserveDialog extends JDialog {
     private JTextField roomNumberField;
     private JTextField dateField;
     private JTextField usernameField;
-    private JButton okButton;
+    public JButton okButton;
     private ReserveRoomController reserveRoomController;
 
     public PopupReserveDialog(JFrame frame) {
@@ -91,9 +91,9 @@ public class PopupReserveDialog extends JDialog {
 
     public void setReserveRoomController(ReserveRoomController controller) {
         this.reserveRoomController = controller;
-        System.out.println(controller+" " +this.reserveRoomController);
+        System.out.println("Setting ReserveRoomController: " + controller); // Debug message
         okButton.addActionListener(e -> {
-            System.out.println("OK button clicked"); // Debugging message
+            System.out.println("OK button clicked in setReserveRoomController"); // Debugging message
             reserveRoomController.handleReservation();
         });
     }

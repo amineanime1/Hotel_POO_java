@@ -2,20 +2,34 @@ package Controller;
 
 import Model.Reservation;
 import Model.ReservationManagement;
+import View.HomeClientPanel;
 import View.PopupReserveDialog;
+import View.ReserveRoomPanel;
 
 import javax.swing.*;
+
+import java.awt.CardLayout;
 import java.util.function.Consumer;
 
 public class ReserveRoomController {
+    private JFrame mainFrame;
+    private JPanel cardPanel;
+    private CardLayout cardLayout;
+    private HomeClientPanel homeClientPanel;
+    private ReserveRoomPanel reserveRoomPanel;
     private ReservationManagement reservationManagement;
     private PopupReserveDialog reserveDialog;
     private Consumer<Reservation> reserveSuccessListener;
 
-    public ReserveRoomController(ReservationManagement reservationManagement, PopupReserveDialog reserveDialog) {
+    public ReserveRoomController(JFrame mainFrame, ReservationManagement reservationManagement, PopupReserveDialog reserveDialog, ReserveRoomPanel reserveRoomPanel ,HomeClientPanel homeClientPanel) {
+        this.mainFrame = mainFrame;
+        this.cardPanel = (JPanel) mainFrame.getContentPane();
+        this.cardLayout = (CardLayout) cardPanel.getLayout();
         this.reservationManagement = reservationManagement;
         this.reserveDialog = reserveDialog;
         this.reserveDialog.setReserveRoomController(this);
+        this.homeClientPanel = homeClientPanel;
+        this.reserveRoomPanel = reserveRoomPanel;
     }
 
     public void setReserveSuccessListener(Consumer<Reservation> listener) {
@@ -29,7 +43,7 @@ public class ReserveRoomController {
         String date = reserveDialog.getDate();
         String username = reserveDialog.getUsername();
 
-        if (roomNumber.isEmpty() || date.isEmpty() || username.isEmpty()) {
+        if (roomNumber.isEmpty() || date.isEmpty()) {
             JOptionPane.showMessageDialog(reserveDialog, "All fields must be filled", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }

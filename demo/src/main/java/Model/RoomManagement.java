@@ -1,5 +1,6 @@
 package Model;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.sql.ResultSet;
@@ -96,5 +97,23 @@ public void saveRoomsToDatabase() {
     } catch (SQLException e) {
         e.printStackTrace();
     }
+}
+public Object[][] getRoomData() {
+     Object[][] data = new Object[rooms.size()][3];
+    int i = 0;
+    for (Room room : rooms.values()) {
+        data[i][0] = room.getNumber();
+        data[i][1] = room.getType();
+        data[i][2] = room.getPrice() + " Dzd";
+        i++;
+    }
+
+    // Print room data for debugging
+    System.out.println("Room data for table:");
+    for (Object[] row : data) {
+        System.out.println(Arrays.toString(row));
+    }
+
+    return data;
 }
 }
