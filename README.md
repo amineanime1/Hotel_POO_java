@@ -45,5 +45,13 @@ git clone https://github.com/votre-utilisateur/gestion-hotel.git
 cd gestion-hotel/demo
 mvn install
 ```
+## Utilisation
+Lancez l'application à partir du fichier Main.java dans le dossier main.
+
+## Contributeurs
+IZEM Mohamed Amine - amne.zem@gmail.com
+HAMAMTI Yacine - hamamtiyacine1@gmail.com
+IMANSOURA Ramy- imansoura.ramy@gmail.com
+
 
 **Bonne Journée ! :)**
