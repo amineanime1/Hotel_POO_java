@@ -21,6 +21,3 @@ mvn exec:java -Dexec.mainClass="com.yourpackage.Main"
 ```
 ## Base de Données
 Assurez-vous que votre base de données est configurée correctement dans le fichier pom.xml.
-
-## Captures d'écran
-Les captures d'écran de l'interface graphique se trouvent dans le dossier Screenshots.
