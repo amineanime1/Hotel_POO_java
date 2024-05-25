@@ -8,10 +8,12 @@ import View.HomeClientPanel;
 import View.ReserveRoomPanel;
 import View.CheckReservationsPanel;
 import View.PopupReserveDialog;
+import View.PopupCheckReserveDialog;
 import Controller.LoginController;
 import Controller.DataController;
 import Controller.ClientHomeController;
 import Controller.ReserveRoomController;
+import Controller.CheckReservationsController;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -24,11 +26,11 @@ public class MainGUITest {
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         
-        // Initialiser cardPanel avec un CardLayout
+        // Initialize cardPanel with CardLayout
         JPanel cardPanel = new JPanel();
         cardPanel.setLayout(new CardLayout());
         
-        // Récupérer le CardLayout à partir de cardPanel
+        // Retrieve CardLayout from cardPanel
         CardLayout cardLayout = (CardLayout) cardPanel.getLayout();
 
         Application model = new Application();
@@ -37,8 +39,9 @@ public class MainGUITest {
 
         LoginPanel loginView = new LoginPanel();
         HomeClientPanel homeClientView = new HomeClientPanel();
-        CheckReservationsPanel checkReservationsPanel = new CheckReservationsPanel(frame);
+        CheckReservationsPanel checkReservationsPanel = new CheckReservationsPanel(frame, roomManagement, reservationManagement);
         PopupReserveDialog reserveDialog = new PopupReserveDialog(frame);
+        PopupCheckReserveDialog checkReserveDialog = new PopupCheckReserveDialog(frame);
 
         LoginController loginController = new LoginController(model, loginView);
         DataController dataController = new DataController(model);
@@ -85,6 +88,12 @@ public class MainGUITest {
             cardLayout.show(cardPanel, "CheckReservationsPanel");
         });
 
-        reserveDialog.setReserveRoomController(reserveRoomController); // Ensure this is called
+        reserveDialog.setReserveRoomController(reserveRoomController);
+
+        CheckReservationsController checkReservationsController = new CheckReservationsController(
+            frame, reservationManagement, checkReserveDialog, checkReservationsPanel, cardPanel, cardLayout, clientHomeController.getCurrentUsername()
+        );
+
+        checkReserveDialog.setController(checkReservationsController);
     }
 }

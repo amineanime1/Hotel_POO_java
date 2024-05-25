@@ -1,23 +1,29 @@
 package View;
 
 import javax.swing.*;
+import Controller.CheckReservationsController;
+import Model.Reservation;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
 
 public class PopupCheckReserveDialog extends JDialog {
-
-    private JButton okButton; // Declare okButton as an instance variable
+    private JButton okButton;
     private JTextField roomNumberField;
     private JTextField dateField;
     private JTextField newDateField;
+    private JTextField usernameField;
     private JRadioButton modifyRadioButton;
     private JRadioButton annulerRadioButton;
+    private CheckReservationsController controller;
+    private int reservationId;
+    private String currentUser;
 
     public PopupCheckReserveDialog(JFrame frame) {
         super(frame, true);
-        setSize(400, 300);
+        setSize(400, 400);
         setUndecorated(true);
-        setShape(new RoundRectangle2D.Double(0, 0, 400, 300, 50, 50));
+        setShape(new RoundRectangle2D.Double(0, 0, 400, 400, 50, 50));
         getContentPane().setBackground(Color.WHITE);
         setLayout(null);
 
@@ -28,39 +34,54 @@ public class PopupCheckReserveDialog extends JDialog {
         titleLabel.setBounds(0, 20, 400, 50);
         add(titleLabel);
 
+        // Add username field
+        JLabel usernameLabel = new JLabel("Username");
+        usernameLabel.setFont(new Font("SansSerif", Font.PLAIN, 20));
+        usernameLabel.setBounds(50, 80, 300, 30);
+        add(usernameLabel);
+
+        usernameField = new JTextField();
+        usernameField.setFont(new Font("SansSerif", Font.PLAIN, 20));
+        usernameField.setBounds(50, 110, 300, 30);
+        usernameField.setBorder(BorderFactory.createLineBorder(Color.decode("#00bfff"), 2));
+        usernameField.setEditable(false); // Make this field non-editable
+        add(usernameField);
+
         // Add room number and date fields on the same line
         JLabel roomNumberLabel = new JLabel("Number");
         roomNumberLabel.setFont(new Font("SansSerif", Font.PLAIN, 20));
-        roomNumberLabel.setBounds(50, 80, 80, 30);
+        roomNumberLabel.setBounds(50, 150, 80, 30);
         add(roomNumberLabel);
 
         roomNumberField = new JTextField();
         roomNumberField.setFont(new Font("SansSerif", Font.PLAIN, 20));
-        roomNumberField.setBounds(140, 80, 80, 30);
+        roomNumberField.setBounds(140, 150, 80, 30);
         roomNumberField.setBorder(BorderFactory.createLineBorder(Color.decode("#00bfff"), 2));
+        roomNumberField.setEditable(false); // Make this field non-editable
         add(roomNumberField);
 
         JLabel dateLabel = new JLabel("Date");
         dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 20));
-        dateLabel.setBounds(230, 80, 50, 30);
+        dateLabel.setBounds(230, 150, 50, 30);
         add(dateLabel);
 
         dateField = new JTextField();
         dateField.setFont(new Font("SansSerif", Font.PLAIN, 20));
-        dateField.setBounds(290, 80, 80, 30);
+        dateField.setBounds(290, 150, 80, 30);
         dateField.setBorder(BorderFactory.createLineBorder(Color.decode("#00bfff"), 2));
+        dateField.setEditable(false); // Make this field non-editable
         add(dateField);
 
         // Add radio buttons for Modify and Annuler on the same line
         modifyRadioButton = new JRadioButton("Modify");
         modifyRadioButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
-        modifyRadioButton.setBounds(50, 130, 100, 30);
+        modifyRadioButton.setBounds(50, 190, 100, 30);
         modifyRadioButton.setBackground(Color.WHITE);
         add(modifyRadioButton);
 
         annulerRadioButton = new JRadioButton("Annuler");
         annulerRadioButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
-        annulerRadioButton.setBounds(250, 130, 100, 30);
+        annulerRadioButton.setBounds(250, 190, 100, 30);
         annulerRadioButton.setBackground(Color.WHITE);
         add(annulerRadioButton);
 
@@ -72,13 +93,13 @@ public class PopupCheckReserveDialog extends JDialog {
         // Add new date field, initially hidden
         JLabel newDateLabel = new JLabel("New Date");
         newDateLabel.setFont(new Font("SansSerif", Font.PLAIN, 20));
-        newDateLabel.setBounds(50, 180, 300, 30);
+        newDateLabel.setBounds(50, 230, 300, 30);
         newDateLabel.setVisible(false); // Initially hidden
         add(newDateLabel);
 
         newDateField = new JTextField();
         newDateField.setFont(new Font("SansSerif", Font.PLAIN, 20));
-        newDateField.setBounds(150, 180, 220, 30);
+        newDateField.setBounds(150, 230, 220, 30);
         newDateField.setBorder(BorderFactory.createLineBorder(Color.decode("#00bfff"), 2));
         newDateField.setVisible(false); // Initially hidden
         add(newDateField);
@@ -97,38 +118,47 @@ public class PopupCheckReserveDialog extends JDialog {
         // Add OK button
         okButton = new JButton("ok");
         okButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
-        okButton.setBounds(170, 240, 60, 30);
+        okButton.setBounds(170, 300, 60, 30);
         okButton.setForeground(Color.WHITE);
         okButton.setBackground(Color.decode("#00bfff"));
-        okButton.addActionListener(e -> {
-            setVisible(false);
-            // overlayPanel.setVisible(false); // You need to handle this outside this class
-        });
-
         add(okButton);
     }
 
-    public JButton getOkButton() {
-        return okButton;
+    public void setController(CheckReservationsController controller) {
+        this.controller = controller;
     }
 
-    public JTextField getRoomNumberField() {
-        return roomNumberField;
+    public void setReservation(Reservation reservation, String currentUser) {
+        this.reservationId = reservation.getId();
+        this.currentUser = currentUser;
+        roomNumberField.setText(String.valueOf(reservation.getRoomId()));
+        dateField.setText(reservation.getStartDate());
+        usernameField.setText(currentUser);
+        modifyRadioButton.setSelected(true);
+        newDateField.setText("");
+        newDateField.setVisible(true);
     }
 
-    public JTextField getDateField() {
-        return dateField;
+    public Reservation getModifiedReservation() {
+        return new Reservation(
+            reservationId,
+            currentUser, // Assuming username is correct
+            Integer.parseInt(roomNumberField.getText()), // Assuming room ID doesn't change
+            dateField.getText(),
+            newDateField.getText(),
+            "Modified"
+        );
     }
 
-    public JTextField getNewDateField() {
-        return newDateField;
+    public int getReservationId() {
+        return reservationId;
     }
 
-    public JRadioButton getModifyRadioButton() {
-        return modifyRadioButton;
+    public boolean isModifySelected() {
+        return modifyRadioButton.isSelected();
     }
 
-    public JRadioButton getAnnulerRadioButton() {
-        return annulerRadioButton;
+    public void addOkListener(ActionListener listener) {
+        okButton.addActionListener(listener);
     }
 }

@@ -40,6 +40,9 @@ public class ClientHomeController {
         reserveRoomPanel.setCurrentUsername(username);
     }
 
+    public String getCurrentUsername() {
+        return this.currentUsername;
+    }
     class ReserveButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             cardLayout.show(cardPanel, "ReserveRoomPanel");

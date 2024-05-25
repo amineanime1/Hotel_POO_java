@@ -1,14 +1,17 @@
 package View;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
+import java.util.List;
+import Model.Reservation;
+import Model.ReservationManagement;
+import Model.RoomManagement;
 
 public class CheckReservationsPanel extends JPanel {
 
@@ -16,8 +19,11 @@ public class CheckReservationsPanel extends JPanel {
     private JPanel overlayPanel;
     private JButton modifyReservationButton;
     private JButton backButton;
+    private JTable roomTable;
+    private RoomManagement roomM;
 
-    public CheckReservationsPanel(JFrame frame) {
+    public CheckReservationsPanel(JFrame frame, RoomManagement roomManagement, ReservationManagement reservationManagement) {
+        this.roomM = roomManagement;
         setBackground(Color.WHITE);
         setLayout(null);
 
@@ -37,13 +43,9 @@ public class CheckReservationsPanel extends JPanel {
 
         // Create table for rooms
         String[] columnNames = { "Number", "Type", "Price", "Date" };
-        Object[][] data = {
-            { "102", "Dual", "2500 Dzd", "11/05/2024" },
-            { "103", "Small", "1000 Dzd", "12/05/2024" },
-            { "105", "Solo", "2000 Dzd", "15/05/2024" }
-        };
+        Object[][] data = reservationManagement.getReservationsData();  // Initialize with empty data
 
-        JTable roomTable = new JTable(data, columnNames) {
+        roomTable = new JTable(new DefaultTableModel(data, columnNames)) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -150,14 +152,6 @@ public class CheckReservationsPanel extends JPanel {
                 }
             }
         });
-
-        // Add action listener to OK button in popup dialog to close popup and hide overlay
-        // popupDialog.getOkButton().addActionListener(e -> {
-        //     popupDialog.setVisible(false);
-        //     overlayPanel.setVisible(false);
-        //     frame.requestFocus();
-        //     frame.repaint();
-        // });
     }
 
     private void showPopup(JFrame frame) {
@@ -174,7 +168,7 @@ public class CheckReservationsPanel extends JPanel {
         }
     }
 
-    public void addReserveRoomListener(ActionListener listener) {
+    public void addModifyReservationListener(ActionListener listener) {
         modifyReservationButton.addActionListener(listener);
     }
 
@@ -182,11 +176,24 @@ public class CheckReservationsPanel extends JPanel {
         backButton.addActionListener(listener);
     }
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
-        frame.add(new CheckReservationsPanel(frame));
-        frame.setVisible(true);
+    public int getSelectedRow() {
+        return roomTable.getSelectedRow();
+    }
+
+    public int getReservationId(int row) {
+        return Integer.parseInt(roomTable.getValueAt(row, 0).toString());
+    }
+
+    public void updateTableData(List<Reservation> reservations) {
+        DefaultTableModel model = (DefaultTableModel) roomTable.getModel();
+        model.setRowCount(0); // Clear existing data
+        for (Reservation reservation : reservations) {
+            model.addRow(new Object[] {
+                reservation.getRoomId(),
+                roomM.getTypeById(reservation.getRoomId()), // Assuming a getRoomType() method exists
+                roomM.getPriceById(reservation.getRoomId()) ,    // Assuming a getPrice() method exists
+                reservation.getStartDate()  // Assuming a getStartDate() method exists
+            });
+        }
     }
 }

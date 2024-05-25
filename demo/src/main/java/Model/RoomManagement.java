@@ -43,6 +43,23 @@ public class RoomManagement {
         }
     // Other methods to add, remove, or modify rooms...
 }
+public double getPriceById(int id) {
+    for (Room room : rooms.values()) {
+        if (room.getId() == id) {
+            return room.getPrice();
+        }
+    }
+    return -1;  // Return -1 or any invalid value if no room with the given id is found
+}
+
+public String getTypeById(int id) {
+    for (Room room : rooms.values()) {
+        if (room.getId() == id) {
+            return room.getType();
+        }
+    }
+    return null;  // Return null if no room with the given id is found
+}
 public void loadRoomsFromDatabase() {
     Database db = new Database();
     try {

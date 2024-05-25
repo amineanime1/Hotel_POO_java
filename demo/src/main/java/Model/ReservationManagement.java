@@ -1,6 +1,9 @@
 package Model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -11,11 +14,15 @@ import java.sql.SQLException;
 
 public class ReservationManagement {
     private Map<Integer, Reservation> reservations;
+    private Map<Integer, Room> rooms;
 
     public ReservationManagement() {
         reservations = new HashMap<>();
     }
-
+    public ReservationManagement(RoomManagement roomManagement) {
+        reservations = new HashMap<>();
+        rooms = roomManagement.getRooms();
+    }
     public Map<Integer, Reservation> getReservations() {
         return reservations;
     }
@@ -31,7 +38,18 @@ public class ReservationManagement {
     public void addReservation(Reservation reservation) {
         reservations.put(reservation.getId(), reservation);
     }
-
+    public List<Reservation> getAllReservations() {
+        return new ArrayList<>(reservations.values());
+    }
+    public List<Reservation> getReservationsByUser(String username) {
+        List<Reservation> userReservations = new ArrayList<>();
+        for (Reservation reservation : reservations.values()) {
+            if (reservation.getUsername().equals(username)) {
+                userReservations.add(reservation);
+            }
+        }
+        return userReservations;
+    }
     public Reservation getReservationById(int id) {
         return reservations.get(id);
     }
@@ -100,5 +118,24 @@ public class ReservationManagement {
     } catch (SQLException e) {
         e.printStackTrace();
     }
+}
+public Object[][] getReservationsData() {
+     Object[][] data = new Object[reservations.size()][4];
+    int i = 0;
+    for (Reservation reservations : reservations.values()) {
+        data[i][0] = reservations.getId();
+        data[i][1] = rooms.get(data[i][0]).getType();
+        data[i][2] = rooms.get(data[i][0]).getPrice() + " Dzd";
+        data[i][3] = reservations.getStartDate() + " - " + reservations.getEndDate();
+        i++;
+    }
+
+    // Print room data for debugging
+    System.out.println("Reservations data for table:");
+    for (Object[] row : data) {
+        System.out.println(Arrays.toString(row));
+    }
+
+    return data;
 }
 }
